@@ -5,3 +5,4 @@
 !build.gradle.kts
 !gradle.properties
 !settings.gradle.kts
+!docker/ffmpeg-clip-wrapper.sh

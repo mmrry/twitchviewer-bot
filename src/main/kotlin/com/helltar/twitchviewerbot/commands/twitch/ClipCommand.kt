@@ -6,6 +6,7 @@ import com.helltar.twitchviewerbot.bot.BotContext
 import com.helltar.twitchviewerbot.commands.TwitchCommand
 import com.helltar.twitchviewerbot.coroutines.runCatchingPreservingCancellation
 import com.helltar.twitchviewerbot.database.dao.usersDao
+import com.helltar.twitchviewerbot.media.ClipConcurrency
 import com.helltar.twitchviewerbot.media.ClipFormat
 import com.helltar.twitchviewerbot.media.ClipProcesses.ffmpegExtractAudio
 import com.helltar.twitchviewerbot.media.ClipProcesses.ffmpegPrepareClip
@@ -14,6 +15,7 @@ import com.helltar.twitchviewerbot.media.ClipProcesses.probeVideoInfo
 import com.helltar.twitchviewerbot.media.ClipProcesses.startStreamlinkProcess
 import com.helltar.twitchviewerbot.media.ClipTempStorage
 import com.helltar.twitchviewerbot.media.VideoInfo
+import com.helltar.twitchviewerbot.text.escapeHtml
 import com.helltar.twitchviewerbot.text.plusUUID
 import com.helltar.twitchviewerbot.text.toTwitchHtmlLink
 import com.helltar.twitchviewerbot.twitch.StreamInfo
@@ -86,7 +88,7 @@ class ClipCommand(
             if (filtered.isNotEmpty())
                 fetchAndSendClips(filtered)
             else
-                replyToMessage(localizedString(Localization.FILTER_NO_CHANNELS_FOUND).format(input))
+                replyToMessage(localizedString(Localization.FILTER_NO_CHANNELS_FOUND).format(input.escapeHtml()))
 
             return
         }
@@ -128,7 +130,8 @@ class ClipCommand(
         val jobs =
             chunk.map { stream ->
                 launch {
-                    downloadAndSendClip(stream)
+                    // global cap across all users; waiting here is cancellable via /cancel
+                    ClipConcurrency.withSlot(userId) { downloadAndSendClip(stream) }
                 }
             }
 

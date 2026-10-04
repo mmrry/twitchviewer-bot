@@ -16,14 +16,16 @@ mkdir twitchbot && cd twitchbot && curl -fsSLO \
   mv .env.example .env
 ```
 
-Edit `.env` and fill in your values:
+Edit `.env` and fill in your values (and keep it private: `chmod 600 .env`):
 
 - `CREATOR_ID`: your Telegram user ID
 - `BOT_TOKEN`: Telegram bot token ([BotFather](https://t.me/BotFather))
 - `BOT_USERNAME`: Telegram bot username ([BotFather](https://t.me/BotFather))
 - `TWITCH_CLIENT_ID`: Twitch app client ID ([Twitch Developer Console](https://dev.twitch.tv/console/apps))
 - `TWITCH_CLIENT_SECRET`: Twitch app client secret ([Twitch Developer Console](https://dev.twitch.tv/console/apps))
-- `POSTGRESQL_*` + `DATABASE_*`: PostgreSQL connection settings
+- `POSTGRESQL_*` + `DATABASE_*`: PostgreSQL connection settings (use a strong random `DATABASE_PASSWORD`)
+- optional `MAX_CONCURRENT_CLIPS`: max clips recorded at once across all users (default 6, extra requests are queued)
+- optional `BOT_MEM_LIMIT` / `BOT_TMP_SIZE` / `BOT_CPUS`: container limits, see `compose.yaml`
 
 Start the bot:
 
@@ -59,3 +61,7 @@ docker compose up -d
 ## Notes
 
 - The bot requires `ffmpeg` and `streamlink` (already included in the provided Docker image).
+- The image ships an `ffmpeg` shim (`docker/ffmpeg-clip-wrapper.sh`) that starts each clip on the first video
+  keyframe, so Telegram shows a preview instead of a black square. Disable with `CLIP_PREVIEW_FIX=0`.
+- The container runs as a non-root user with a read-only root filesystem, no capabilities and `/tmp` on tmpfs;
+  PostgreSQL is only reachable on an internal network.

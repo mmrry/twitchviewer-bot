@@ -8,6 +8,21 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # reaps orphaned ffmpeg/streamlink children (java as PID 1 doesn't)
+    init: true
+    # hardening: immutable root fs, no Linux capabilities, no privilege escalation via setuid binaries
+    read_only: true
+    cap_drop: [ ALL ]
+    security_opt: [ "no-new-privileges:true" ]
+    # clips (streamlink .ts + ffmpeg .mp4, up to ~100 MB per channel) and the healthcheck file live here;
+    # tmpfs is RAM-backed, so keep BOT_TMP_SIZE below BOT_MEM_LIMIT
+    tmpfs:
+      - /tmp:size=${BOT_TMP_SIZE:-1g},mode=1777,nosuid,nodev
+    # caps the damage if many users spam /clip at once (every clip runs streamlink + ffmpeg)
+    mem_limit: ${BOT_MEM_LIMIT:-2g}
+    cpus: ${BOT_CPUS:-2}
+    pids_limit: 512
+    networks: [ default, db ]
     logging:
       driver: json-file
       options:
@@ -23,6 +38,10 @@ services:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       PGPORT: ${POSTGRESQL_PORT}
+    security_opt: [ "no-new-privileges:true" ]
+    shm_size: 128mb
+    # only reachable from the bot; no internet egress, no published ports
+    networks: [ db ]
     volumes:
       - postgres-data:/var/lib/postgresql
     healthcheck:
@@ -30,6 +49,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+networks:
+  default:
+  db:
+    internal: true
 
 volumes:
   postgres-data:

@@ -14,6 +14,7 @@ import com.helltar.twitchviewerbot.media.ClipFormat
 import com.helltar.twitchviewerbot.commands.twitch.ScreenshotCommand
 import com.helltar.twitchviewerbot.database.dao.userChannelsDao
 import com.helltar.twitchviewerbot.database.dao.usersDao
+import com.helltar.twitchviewerbot.text.escapeHtml
 import com.helltar.twitchviewerbot.text.toTwitchHtmlLink
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.telegram.telegrambots.meta.api.methods.ParseMode
@@ -75,7 +76,8 @@ class MenuHandler(private val dependencies: BotDependencies) : CommandBundle<For
                 editMessage(
                     ctx,
                     localizedString(Localization.USER_CLOSE_LIST, languageCode).format(
-                        ctx.user().firstName,
+                        // user-controlled, goes into an HTML-parsed message
+                        ctx.user().firstName.escapeHtml(),
                         dependencies.settings.username
                     )
                 )
