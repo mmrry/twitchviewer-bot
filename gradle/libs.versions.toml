@@ -4,8 +4,8 @@ exposed = "1.1.1"
 kotlin = "2.4.0"
 kotlin-logging = "8.0.4"
 logback = "1.5.27"
-r2dbc-postgresql = "1.1.1.RELEASE"
 shadow = "9.3.0"
+sqlite-jdbc = "3.53.4.0"
 tgbots-module = "9.5.0"
 heartbeat = "0.1.0"
 twitch4j = "1.26.0"
@@ -14,10 +14,10 @@ twitch4j = "1.26.0"
 dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv-kotlin" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
-exposed-r2dbc = { module = "org.jetbrains.exposed:exposed-r2dbc", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-r2dbc-postgresql = { module = "org.postgresql:r2dbc-postgresql", version.ref = "r2dbc-postgresql" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 tgbots-module = { module = "com.annimon:tgbots-module", version.ref = "tgbots-module" }
 heartbeat = { module = "com.helltar:heartbeat", version.ref = "heartbeat" }
 twitch4j = { module = "com.github.twitch4j:twitch4j", version.ref = "twitch4j" }

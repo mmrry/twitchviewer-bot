@@ -7,11 +7,10 @@ import com.helltar.twitchviewerbot.database.tables.UsersTable.firstName
 import com.helltar.twitchviewerbot.database.tables.UsersTable.languageCode
 import com.helltar.twitchviewerbot.database.tables.UsersTable.updatedAt
 import com.helltar.twitchviewerbot.database.tables.UsersTable.username
-import kotlinx.coroutines.flow.singleOrNull
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.r2dbc.select
-import org.jetbrains.exposed.v1.r2dbc.update
-import org.jetbrains.exposed.v1.r2dbc.upsert
+import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.update
+import org.jetbrains.exposed.v1.jdbc.upsert
 import org.telegram.telegrambots.meta.api.objects.User
 import java.time.Instant
 

@@ -14,11 +14,7 @@ data class TwitchConfig(
 )
 
 data class DatabaseConfig(
-    val host: String,
-    val port: Int,
-    val name: String,
-    val user: String,
-    val password: String
+    val path: String
 )
 
 object Config {
@@ -38,13 +34,10 @@ object Config {
             clientSecret = readEnv("TWITCH_CLIENT_SECRET")
         )
 
+    // single SQLite file; in Docker it lives on the /data volume
     val database =
         DatabaseConfig(
-            host = readEnv("POSTGRESQL_HOST"),
-            port = readNumericEnv("POSTGRESQL_PORT", String::toIntOrNull),
-            name = readEnv("DATABASE_NAME"),
-            user = readEnv("DATABASE_USER"),
-            password = readEnv("DATABASE_PASSWORD")
+            path = dotenv["DATABASE_PATH"]?.trim()?.ifEmpty { null } ?: "data/twitchbot.db"
         )
 
     // max clips (streamlink + ffmpeg) recorded at the same time across all users

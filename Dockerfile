@@ -38,7 +38,12 @@ RUN mkdir -p /etc/streamlink && \
 # /usr/local/bin precedes /usr/bin in PATH; the real binary stays at /usr/bin/ffmpeg. Owned by root, not writable by the bot.
 COPY --chmod=0755 docker/ffmpeg-clip-wrapper.sh /usr/local/bin/ffmpeg
 
-RUN adduser -u 10001 -D -s /sbin/nologin twitchbot
+RUN adduser -u 10001 -D -s /sbin/nologin twitchbot && \
+    mkdir -p /data && chown twitchbot:twitchbot /data && chmod 0700 /data
+
+# SQLite database (bot users, channel lists, clip durations); mount a volume here to keep it across rebuilds
+ENV DATABASE_PATH=/data/twitchbot.db
+VOLUME ["/data"]
 
 # root-owned (COPY ignores USER), so the running bot can't overwrite its own jar
 COPY --from=builder /app/build/libs/*-all.jar twitchviewer-bot.jar

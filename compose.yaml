@@ -5,15 +5,15 @@ services:
     image: ghcr.io/helltar/twitchbot:latest
     restart: unless-stopped
     env_file: .env
-    depends_on:
-      postgres:
-        condition: service_healthy
     # reaps orphaned ffmpeg/streamlink children (java as PID 1 doesn't)
     init: true
     # hardening: immutable root fs, no Linux capabilities, no privilege escalation via setuid binaries
     read_only: true
     cap_drop: [ ALL ]
     security_opt: [ "no-new-privileges:true" ]
+    volumes:
+      # SQLite database file (+ its -wal/-shm companions)
+      - bot-data:/data
     # clips (streamlink .ts + ffmpeg .mp4, up to ~100 MB per channel) and the healthcheck file live here;
     # tmpfs is RAM-backed, so keep BOT_TMP_SIZE below BOT_MEM_LIMIT
     tmpfs:
@@ -22,38 +22,11 @@ services:
     mem_limit: ${BOT_MEM_LIMIT:-2g}
     cpus: ${BOT_CPUS:-2}
     pids_limit: 512
-    networks: [ default, db ]
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
 
-  postgres:
-    container_name: postgres-container
-    image: postgres:18.4
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      PGPORT: ${POSTGRESQL_PORT}
-    security_opt: [ "no-new-privileges:true" ]
-    shm_size: 128mb
-    # only reachable from the bot; no internet egress, no published ports
-    networks: [ db ]
-    volumes:
-      - postgres-data:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-networks:
-  default:
-  db:
-    internal: true
-
 volumes:
-  postgres-data:
+  bot-data:

@@ -18,9 +18,9 @@ dependencies {
     implementation(libs.twitch4j)
     implementation(libs.dotenv.kotlin)
 
-    runtimeOnly(libs.r2dbc.postgresql)
+    runtimeOnly(libs.sqlite.jdbc)
     implementation(libs.exposed.core)
-    implementation(libs.exposed.r2dbc)
+    implementation(libs.exposed.jdbc)
     implementation(libs.exposed.java.time)
 
     implementation(libs.kotlin.logging)
